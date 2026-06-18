@@ -1,0 +1,108 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 15, 18, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.32);
+  padding: 0;
+
+  /* The form is portaled to document.body, which lives outside the
+     .root container that owns the design-system custom properties.
+     Re-declare the subset the WaitlistForm depends on so borders,
+     blue accents, and text colors resolve identically to the inline
+     form at the bottom of the page. */
+  --bg: #ffffff;
+  --bg-alt: #f5f5f7;
+  --bg-tint: #fafafc;
+  --text: #1d1d1f;
+  --text-muted: #6e6e73;
+  --text-light: #86868b;
+  --blue: #0071e3;
+  --blue-hover: #0077ed;
+  --blue-bright: #2997ff;
+  --green: #34c759;
+  --border: #d2d2d7;
+  --border-soft: #e5e5ea;
+  --r-pill: 980px;
+  --r-card: 22px;
+  --r-card-sm: 14px;
+}
+
+.close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.06);
+  border: none;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+  color: #1d1d1f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.2s, transform 0.15s;
+  font-family: inherit;
+}
+
+.close:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.close:active {
+  transform: scale(0.94);
+}
+
+.header {
+  padding: 32px 32px 0;
+  text-align: left;
+}
+
+.title {
+  font-size: clamp(24px, 3vw, 30px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #1d1d1f;
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: #6e6e73;
+  line-height: 1.45;
+  letter-spacing: -0.005em;
+  margin: 0 0 16px;
+}
+
+@media (max-width: 600px) {
+  .overlay {
+    padding: 12px;
+  }
+  .modal {
+    border-radius: 16px;
+    max-height: calc(100dvh - 24px);
+  }
+  .header {
+    padding: 24px 22px 0;
+  }
+}

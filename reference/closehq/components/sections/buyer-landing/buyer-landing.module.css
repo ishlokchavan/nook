@@ -1,0 +1,2756 @@
+/* Buyer-only landing — Elegostra-inspired navbar + centered hero.
+   Reuses the iClose brand tokens (ink black + #0071e3 blue, Inter type)
+   so it sits consistently alongside the persona body sections that
+   render below it. Only the nav + hero live here; everything further
+   down the page is the shared persona.module.css styling. */
+
+.root {
+  --bg: #ffffff;
+  --bg-alt: #f5f5f7;
+  --ink: #1d1d1f;
+  --text-muted: #6e6e73;
+  --text-light: #86868b;
+  --blue: #0071e3;
+  --blue-hover: #0077ed;
+  --green: #34c759;
+  --border: #d2d2d7;
+  --border-soft: #e5e5ea;
+  --r-pill: 980px;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+/* Blur overlay for scroll transitions */
+.blurOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  pointer-events: none;
+  z-index: 0;
+  transition: backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease, opacity 0.4s ease;
+  opacity: 0;
+  display: none;
+}
+
+.blurOverlay.active {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 1;
+}
+
+/* Panel scroll effect container */
+.panel {
+  width: 100%;
+  position: relative;
+}
+
+/* Scroll-progress bar pinned to the very top of the viewport. */
+.scrollProgress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 200;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, #0071e3, #34c759);
+}
+
+/* ----------------- NAV ----------------- */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: 60px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 max(22px, calc((100vw - 1180px) / 2));
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s, background 0.3s;
+}
+.navScrolled {
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom-color: rgba(0, 0, 0, 0.07);
+}
+
+.navBrand {
+  display: flex;
+  align-items: center;
+  justify-self: start;
+}
+
+/* Center link cluster — the Elegostra hallmark. */
+.navCenter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-self: center;
+}
+.navCenter a {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  letter-spacing: -0.005em;
+  padding: 7px 14px;
+  border-radius: var(--r-pill);
+  transition: color 0.2s, background 0.2s;
+}
+.navCenter a:hover {
+  color: var(--ink);
+  background: var(--bg-alt);
+}
+
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: end;
+}
+
+/* Ghost pill (left of the primary CTA). */
+.navGhost {
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: var(--r-pill);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  transition: background 0.2s, border-color 0.2s;
+}
+.navGhost:hover {
+  background: var(--bg-alt);
+  border-color: var(--text-light);
+}
+
+/* Solid dark pill — primary nav CTA (matches the reference). */
+.navSolid {
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 20px;
+  border-radius: var(--r-pill);
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  text-decoration: none;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  transition: transform 0.15s, background 0.2s;
+}
+.navSolid:hover {
+  background: #000;
+}
+.navSolid:active {
+  transform: scale(0.97);
+}
+
+.navBurger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: 999px;
+  justify-self: end;
+}
+.navBurger:hover {
+  background: var(--bg-alt);
+}
+
+/* Mobile sheet */
+.mobileSheet {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background: #fff;
+  border-bottom: 1px solid var(--border-soft);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  padding: 8px max(22px, calc((100vw - 1180px) / 2)) 18px;
+  display: flex;
+  flex-direction: column;
+}
+.mobileSheet a {
+  padding: 15px 4px;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: 500;
+}
+.mobileSheetCtas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 16px;
+}
+.mobileSheet .navGhost,
+.mobileSheet .navSolid {
+  height: 46px;
+  justify-content: center;
+  width: 100%;
+  font-size: 15px;
+}
+
+@media (max-width: 860px) {
+  .navCenter,
+  .navRight {
+    display: none;
+  }
+  .nav {
+    grid-template-columns: 1fr auto;
+  }
+  .navBurger {
+    display: inline-flex;
+  }
+}
+
+/* ----------------- HERO ----------------- */
+.hero {
+  position: relative;
+  padding: 80px 22px 56px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.heroInner {
+  max-width: 940px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.heroEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--blue);
+  background: rgba(0, 113, 227, 0.08);
+  padding: 7px 14px;
+  border-radius: 999px;
+  letter-spacing: -0.005em;
+  margin-bottom: 26px;
+}
+.heroEyebrowDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--green);
+  box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.18);
+}
+
+.heroTitle {
+  /* Sized to match the reference's large hero headline (~56px on desktop). */
+  font-size: clamp(28px, 5.5vw, 56px);
+  line-height: 1.08;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  margin: 0;
+  color: var(--ink);
+}
+.heroTitleAccent {
+  color: var(--blue);
+  position: relative;
+  background-image: linear-gradient(90deg, var(--blue) 0%, var(--blue) 0%, transparent 0%);
+  background-position: 0% 100%;
+  background-size: 100% 3px;
+  background-repeat: no-repeat;
+  transition: background-image 0.3s ease;
+}
+
+.heroAccentPara {
+  font-size: 17px;
+  line-height: 0.2;
+  color: var(--text-light);
+  letter-spacing: -0.01em;
+  margin: 16px auto 0;
+  max-width: 600px;
+  font-weight: 500;
+}
+
+.heroSub {
+  margin: 22px auto 0;
+  max-width: 600px;
+  font-size: clamp(13px, 1.6vw, 15px);
+  line-height: 1.55;
+  color: var(--text-muted);
+  letter-spacing: -0.01em;
+}
+
+.heroCtas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 32px;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 26px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+  pointer-events: auto;
+  z-index: 11;
+}
+.btnPrimary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btnPrimary:hover {
+  background: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+.btnPrimary:hover::before {
+  left: 100%;
+}
+.btnPrimary:active {
+  transform: scale(0.98);
+}
+
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 24px;
+  border-radius: var(--r-pill);
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--border);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+  position: relative;
+  pointer-events: auto;
+  z-index: 11;
+}
+.btnGhost:hover {
+  background: var(--bg-alt);
+  border-color: var(--text-light);
+}
+.btnGhost span[aria-hidden] {
+  transition: transform 0.2s;
+}
+.btnGhost:hover span[aria-hidden] {
+  transform: translateX(3px);
+}
+
+/* ---------- Abstract centerpiece + floating cards ---------- */
+.heroStage {
+  position: relative;
+  width: 100%;
+  max-width: 1180px;
+  /* Height tracks the skyline's own aspect ratio (~0.325 of its width) so the
+     full-bleed skyline fills the stage instead of dropping into a gap below
+     the cards. 32.5vw ≈ 100vw * 1243/3822; the cap matches the 2000px width
+     cap on .orbSkyline. */
+  height: clamp(300px, 32.5vw, 650px);
+  margin: 20px auto 0;
+  overflow: visible;
+}
+
+/* Desktop: make the first view fill the screen with the skyline anchored to
+   its bottom. heroInner stretches to (almost) the full viewport height and the
+   stage is pushed to the bottom with margin-top: auto, so above the fold you
+   see title + CTAs + skyline, and the developer logo strip (which follows)
+   lands just below the fold, ahead of the next section. Scoped to >=761px so
+   the mobile vertical stack is unaffected. */
+@media (min-width: 761px) {
+  .heroInner {
+    min-height: calc(100svh - 96px);
+  }
+  .heroStage {
+    margin-top: auto;
+    margin-bottom: 0;
+  }
+}
+
+/* Dashed elliptical orbit rings — decorative, sit behind the flower. */
+.orbits {
+  position: absolute;
+  left: 50%;
+  top: 66%;
+  width: 172%;
+  max-width: 1640px;
+  transform: translate(-50%, calc(-50% - 150px));
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  animation: none;
+  clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+}
+
+@keyframes orbitsRotate {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Dubai skyline silhouette — the hero centrepiece. Full-bleed and anchored
+   to the bottom of the stage so it reads as a horizon line beneath the
+   headline, CTAs and floating stat cards.
+
+   - `width` bleeds slightly past the viewport while capping on huge screens;
+     `height: auto` preserves the asset's aspect ratio so the full skyline
+     (including the Burj spire) is always visible, never cropped.
+   - Centred with translateX(-50%); the hero's `overflow: hidden` clips the
+     bleed so there is no horizontal scroll.
+   - z-index 1: above the decorative orbit arcs (0), below the floating
+     cards (2) — exactly the layering in the reference. `pointer-events: none`
+     keeps it from ever intercepting a CTA click. */
+.orbSkyline {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  /* Full-bleed: spans the viewport edge-to-edge (clipped by the hero's
+     overflow: hidden) and only caps on very large monitors. height: auto
+     keeps the whole skyline — Burj spire included — visible, never cropped.
+     max-width: none overrides Tailwind preflight's `img { max-width: 100% }`,
+     which would otherwise cap the skyline to its parent (~1180px) and stop it
+     from bleeding past the content column. */
+  width: min(2000px, 101vw);
+  max-width: none;
+  height: auto;
+  z-index: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* iOS-style floating cards */
+.fcard {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px 25px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 28px;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.fcard:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(255, 255, 255, 1);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+.fcardIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 17px;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+.fcardIconGreen {
+  background: rgba(52, 199, 89, 0.14);
+  color: #1e9e44;
+}
+.fcardIconBlue {
+  background: rgba(0, 113, 227, 0.12);
+  color: var(--blue);
+}
+.fcardIconInk {
+  background: rgba(29, 29, 31, 0.06);
+  color: var(--ink);
+}
+.fcardLabel {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text-light);
+  letter-spacing: -0.005em;
+  text-transform: capitalize;
+}
+.fcardValue {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+.fcardValueGreen {
+  color: #1e9e44;
+}
+
+/* Left side cards */
+/* Cards float high in the sky band (~12% down the stage), flanking the Burj's
+   upper shaft as in the reference. ~4vw tracks the skyline's 32.5vw height. */
+.fcardC { top: clamp(28px, 4vw, 80px); left: -30px; rotate: -4deg; animation: bob 9s ease-in-out infinite 1.1s; }
+.fcardE { top: 240px; left: -35px; rotate: -5deg; animation: bob 8.5s ease-in-out infinite 0.9s; }
+
+/* Right side cards */
+.fcardA { top: clamp(28px, 4vw, 80px); right: -40px; rotate: 6deg; animation: bob 7s ease-in-out infinite; }
+.fcardVilla { top: 130px; right: -45px; rotate: 5deg; animation: bob 8.5s ease-in-out infinite 0.5s; }
+
+/* Animate the standalone `translate` property so the per-card `rotate`
+   (set above) is preserved during the bob. */
+@keyframes bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -6px; }
+}
+/* Gentle float via the standalone translate/scale properties so the
+   skyline's `transform: translateX(-50%)` centring is preserved while it
+   bobs. */
+@keyframes orbFloat {
+  0%, 100% { translate: 0 0; scale: 1; }
+  50% { translate: 0 -7px; scale: 1.015; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fcardA, .fcardB, .fcardC, .fcardD, .fcardE,
+  .orbSkyline {
+    animation: none;
+  }
+}
+
+/* ---------- Trust / developer strip ---------- */
+.trust {
+  margin: 32px auto 0;
+  padding: 0 22px;
+  max-width: 1100px;
+  text-align: center;
+  position: relative;
+  z-index: 15;
+}
+
+/* Floating white card holding the developer logo lockups */
+.trustBar {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 0;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 18px;
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  border-radius: 22px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 20px 50px rgba(17, 24, 39, 0.10);
+}
+
+.trustItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 4px 22px;
+  color: var(--ink);
+  transition: opacity 0.2s, transform 0.2s;
+}
+/* Divider between items (not after the last) */
+.trustItem:not(:last-child) {
+  box-shadow: 1px 0 0 var(--border-soft);
+}
+.trustItem:hover {
+  transform: translateY(-1px);
+}
+.trustMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  flex-shrink: 0;
+}
+.trustName {
+  font-size: clamp(18px, 2vw, 22px);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+/* Real developer logo image — height-capped AND width-capped so every
+   logo contains within a uniform box regardless of aspect ratio.
+   brightness(0) flattens the varied brand colours to a mono ink row. */
+.trustLogo {
+  height: 22px;
+  width: auto;
+  max-width: 104px;
+  object-fit: contain;
+  filter: brightness(0);
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.trustItem:hover .trustLogo {
+  opacity: 1;
+}
+
+.trustLabel {
+  margin-top: 22px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-light);
+}
+
+@media (max-width: 760px) {
+  .trustItem {
+    padding: 4px 16px;
+  }
+  /* Drop dividers on wrap to avoid stray vertical lines */
+  .trustItem:not(:last-child) {
+    box-shadow: none;
+  }
+}
+
+/* ===================================================================
+   STATEMENT — oversized headline with floating accent chips
+   =================================================================== */
+.stmtSection {
+  position: relative;
+  padding: 110px 22px 100px;
+  background: var(--bg);
+  overflow: hidden;
+}
+.stmtInner {
+  position: relative;
+  max-width: 940px;
+  margin: 0 auto;
+  text-align: center;
+}
+.stmtTag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: #1e9e44;
+  background: rgba(52, 199, 89, 0.12);
+  padding: 7px 16px;
+  border-radius: 999px;
+  margin-bottom: 24px;
+}
+.stmtHeading {
+  font-size: clamp(32px, 5vw, 58px);
+  line-height: 1.06;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+  margin: 0 auto;
+  max-width: 16ch;
+}
+.stmtHeadingAccent {
+  color: var(--text-light);
+}
+
+/* Floating accent chips */
+.stmtChip {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 15px;
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  box-shadow: 0 14px 38px rgba(17, 24, 39, 0.10);
+  white-space: nowrap;
+  animation: chipBob 7s ease-in-out infinite;
+}
+.stmtChipIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  flex-shrink: 0;
+}
+.stmtChipIconGreen {
+  background: rgba(52, 199, 89, 0.14);
+  color: #1e9e44;
+}
+.stmtChipIconBlue {
+  background: rgba(0, 113, 227, 0.12);
+  color: var(--blue);
+}
+.stmtChipIconInk {
+  background: rgba(29, 29, 31, 0.06);
+  color: var(--ink);
+}
+.stmtChipLabel {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-light);
+  letter-spacing: -0.005em;
+}
+.stmtChipValue {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+.stmtChipValueGreen {
+  color: #1e9e44;
+}
+.stmtChipA { top: 8%; left: 4%; animation-delay: 0s; }
+.stmtChipB { top: 34%; right: 2%; animation-delay: 0.9s; }
+.stmtChipC { bottom: 12%; left: 10%; animation-delay: 1.6s; }
+
+@keyframes chipBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Smooth scroll reveal animations */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Button shimmer effect */
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+@media (max-width: 860px) {
+  .stmtSection {
+    padding: 88px 20px 84px;
+  }
+  /* On small screens the chips would collide with the headline — stack
+     them inline below instead of absolutely positioning. */
+  .stmtChip {
+    position: static;
+    display: inline-flex;
+    margin: 10px 6px 0;
+    animation: none;
+  }
+  .stmtChipA, .stmtChipB, .stmtChipC {
+    inset: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stmtChip {
+    animation: none;
+  }
+}
+
+/* ===================================================================
+   TOOLS — feature row + mock-UI product cards
+   =================================================================== */
+.toolsSection {
+  padding: 76px 22px;
+  background: var(--bg);
+}
+.toolsInner {
+  max-width: 1060px;
+  margin: 0 auto;
+}
+.toolsHead {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px 56px;
+  align-items: end;
+  margin-bottom: 36px;
+}
+.toolsHeading {
+  font-size: clamp(30px, 4.2vw, 48px);
+  line-height: 1.07;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin: 0;
+  max-width: 12ch;
+}
+.toolsLede {
+  font-size: clamp(15px, 1.7vw, 17px);
+  line-height: 1.6;
+  color: var(--text-muted);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* ---- Bento grid ---- */
+.bento {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 16px;
+}
+.bentoCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border-soft);
+  border-radius: 22px;
+  overflow: hidden;
+  will-change: transform;
+}
+/* Resource library spans the full left column (both rows). */
+.bentoLib {
+  grid-row: 1 / span 2;
+}
+.bentoHead {
+  margin-bottom: 18px;
+}
+.bentoEyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 12px;
+}
+.bentoTitle {
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  color: var(--ink);
+  margin: 0;
+}
+
+.bentoFoot {
+  margin: 14px 0 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  letter-spacing: -0.005em;
+}
+
+/* ---- Library tile: copy beside a live phone app screen ---- */
+.libGrid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 28px;
+  align-items: center;
+  height: 100%;
+}
+.libCopy {
+  max-width: 30ch;
+}
+
+/* Phone */
+.phone {
+  position: relative;
+  width: 236px;
+  flex-shrink: 0;
+  padding: 9px 9px 0;
+  background: #0f0f12;
+  border-radius: 34px 34px 22px 22px;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 30px 60px rgba(17, 24, 39, 0.28);
+  animation: phoneFloat 7s ease-in-out infinite;
+}
+@keyframes phoneFloat {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50% { transform: translateY(-10px) rotate(-1.5deg); }
+}
+.phoneNotch {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 86px;
+  height: 18px;
+  background: #0f0f12;
+  border-radius: 0 0 12px 12px;
+  z-index: 3;
+}
+.phoneScreen {
+  position: relative;
+  background: #fff;
+  border-radius: 26px 26px 14px 14px;
+  padding: 30px 16px 22px;
+  overflow: hidden;
+}
+.phoneHead {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.phoneDev {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+.phoneProj {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-light);
+}
+.phoneVerified {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: auto;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #1e9e44;
+  background: rgba(52, 199, 89, 0.13);
+  padding: 3px 7px;
+  border-radius: 999px;
+}
+
+/* tabs */
+.phoneTabs {
+  position: relative;
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.phoneTab {
+  flex: 1;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 2px;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--text-light);
+  background: var(--bg-alt);
+  border-radius: 10px;
+  transition: background 0.3s, color 0.3s;
+}
+.phoneTabOn {
+  background: var(--blue);
+  color: #fff;
+}
+.phoneTap {
+  position: absolute;
+  top: -6px;
+  width: 28px;
+  height: 28px;
+  pointer-events: none;
+}
+.phoneTapRing {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: rgba(0, 113, 227, 0.5);
+}
+
+/* body preview */
+.phoneBody {
+  height: 132px;
+  background: var(--bg-alt);
+  border-radius: 12px;
+  padding: 14px;
+  overflow: hidden;
+}
+.phaseInner {
+  height: 100%;
+}
+/* floor plan layout */
+.phFloor {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 5px;
+  height: 100%;
+}
+.phFloor span {
+  background: #fff;
+  border: 1.5px solid rgba(0, 113, 227, 0.35);
+  border-radius: 5px;
+}
+/* master plan plots */
+.phMaster {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  height: 100%;
+}
+.phMaster span {
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1.5px rgba(0, 113, 227, 0.22);
+}
+.phMaster span[data-x='1'] { background: rgba(0, 113, 227, 0.12); }
+.phMaster span[data-x='3'] { background: rgba(52, 199, 89, 0.14); }
+/* payment rows */
+.phPay {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  justify-content: center;
+}
+.phPayRow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.phPayRow span:first-child {
+  width: 64px;
+  flex-shrink: 0;
+}
+.phPayTrack {
+  flex: 1;
+  height: 7px;
+  background: #fff;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.phPayFill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, #0071e3, #34c759);
+}
+.phPayRow b {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink);
+}
+/* factsheet rows */
+.phFacts {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+}
+.phFactRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  font-size: 11px;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.phFactRow:last-child {
+  border-bottom: none;
+}
+.phFactRow b {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* ---- Cashback tile ---- */
+.bentoCash {
+  background: linear-gradient(165deg, #232327 0%, #1a1a1d 55%, #141417 100%);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.bentoCash .bentoEyebrow {
+  color: #7cc0ff;
+}
+.cashRows {
+  display: flex;
+  flex-direction: column;
+  margin-top: auto;
+}
+.cashRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cashRowTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cashTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #c4c4ca;
+}
+.cashStrike {
+  font-size: 12px;
+  font-weight: 500;
+  color: #8a8a90;
+}
+.cashBig {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+/* The win number — this is what should dominate the tile. */
+.cashNum {
+  font-size: clamp(34px, 4.4vw, 46px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  color: #fff;
+}
+/* Supporting caption — deliberately small + green, never competes. */
+.cashCap {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: #51d06a;
+}
+.cashDivider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 22px 0;
+}
+
+/* ---- Sessions tile ---- */
+.sessionList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+.sessionRow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 12px;
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.sessionRow:hover {
+  transform: translateX(3px);
+  box-shadow: 0 8px 22px rgba(17, 24, 39, 0.08);
+}
+.sessionPlay {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: var(--blue);
+  color: #fff;
+  flex-shrink: 0;
+  padding-left: 2px;
+  animation: playPulse 2.2s ease-in-out infinite;
+}
+.sessionPlay[data-i='1'] { animation-delay: 0.7s; }
+.sessionPlay[data-i='2'] { animation-delay: 1.4s; }
+.sessionRow:hover .sessionPlay {
+  scale: 1.1;
+}
+.sessionMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.sessionName {
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  line-height: 1.2;
+}
+.sessionTopic {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-light);
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sessionDur {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-light);
+  background: var(--bg-alt);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+/* Stronger, continuously visible ring pulse + gentle scale. */
+@keyframes playPulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 113, 227, 0.45); }
+  70% { box-shadow: 0 0 0 10px rgba(0, 113, 227, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 113, 227, 0); }
+}
+
+@media (max-width: 860px) {
+  .toolsHead {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+  .bento {
+    grid-template-columns: 1fr;
+  }
+  .bentoLib {
+    grid-row: auto;
+  }
+  .libGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    justify-items: center;
+    text-align: center;
+  }
+  .libCopy {
+    max-width: 38ch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sessionPlay,
+  .phone {
+    animation: none;
+  }
+}
+
+/* ===================================================================
+   STEPS — onboarding media card + numbered timeline
+   =================================================================== */
+.stepsSection {
+  padding: 76px 22px;
+  background: var(--bg);
+}
+.stepsInner {
+  max-width: 1060px;
+  margin: 0 auto;
+}
+.stepsHead {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 40px;
+}
+.stepsEyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 14px;
+}
+.stepsHeading {
+  font-size: clamp(30px, 4.2vw, 48px);
+  line-height: 1.07;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin: 0;
+}
+.stepsSub {
+  margin: 18px auto 0;
+  max-width: 540px;
+  font-size: clamp(15px, 1.8vw, 17px);
+  line-height: 1.55;
+  color: var(--text-muted);
+  letter-spacing: -0.01em;
+}
+
+/* ---- Step flow: auto-advancing app screen + synced rail ---- */
+.flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 36px;
+}
+.flowPhone {
+  position: relative;
+  width: 290px;
+  padding: 9px 9px 0;
+  background: #0f0f12;
+  border-radius: 36px 36px 24px 24px;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 30px 64px rgba(17, 24, 39, 0.26);
+}
+.flowNotch {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 96px;
+  height: 18px;
+  background: #0f0f12;
+  border-radius: 0 0 12px 12px;
+  z-index: 3;
+}
+.flowScreen {
+  position: relative;
+  height: 234px;
+  background: #fff;
+  border-radius: 28px 28px 16px 16px;
+  padding: 32px 18px 20px;
+  overflow: hidden;
+}
+.flowState {
+  height: 100%;
+}
+.fsBox {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.fsIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(0, 113, 227, 0.1);
+  color: var(--blue);
+  margin-bottom: 14px;
+}
+.fsHint {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+.fsField {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 13px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  background: var(--bg-alt);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.fsBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--blue);
+  border-radius: 10px;
+}
+.fsNote {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--text-light);
+  text-align: center;
+}
+.fsProjs {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.fsProj {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 11px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+}
+.fsProjThumb {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  flex-shrink: 0;
+  background: linear-gradient(150deg, #4aa3ff, #0058a3);
+}
+.fsProjMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.fsProjMeta b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.fsProjMeta i {
+  font-size: 11px;
+  font-style: normal;
+  color: var(--text-light);
+}
+.fsToggle {
+  position: relative;
+  display: flex;
+  margin: 12px 0 10px;
+  padding: 4px;
+  background: var(--bg-alt);
+  border-radius: 11px;
+}
+.fsToggleKnob {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  width: calc(50% - 4px);
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(17, 24, 39, 0.1);
+}
+.fsToggleOpt {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  text-align: center;
+  padding: 7px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-light);
+}
+.fsToggleOn {
+  color: var(--blue);
+}
+.fsWin {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.fsWin:last-child {
+  border-bottom: none;
+}
+.fsWinTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-light);
+}
+.fsWinVal {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #1e9e44;
+}
+.flowRail {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+}
+.flowLine {
+  position: absolute;
+  top: 15px;
+  left: 12.5%;
+  right: 12.5%;
+  height: 2px;
+  background: var(--border-soft);
+  border-radius: 999px;
+}
+.flowLineFill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--blue);
+}
+.flowDots {
+  position: relative;
+  display: flex;
+}
+.flowDotItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+.flowDot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid var(--border);
+  color: var(--text-light);
+  font-size: 13px;
+  font-weight: 700;
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
+}
+.flowDotLabel {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-light);
+  transition: color 0.3s;
+}
+.flowDotOn .flowDot {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+.flowDotOn .flowDotLabel {
+  color: var(--ink);
+}
+@media (max-width: 560px) {
+  .flowDotLabel { font-size: 11px; }
+  .flowPhone { width: 260px; }
+}
+
+/* Onboarding media card */
+.onboard {
+  max-width: 680px;
+  margin: 0 auto 52px;
+  padding: 14px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border-soft);
+  border-radius: 26px;
+  box-shadow: 0 24px 60px rgba(17, 24, 39, 0.10);
+}
+.onboardScreen {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 120% at 30% 20%, #2a2a32 0%, #18181b 60%, #0f0f12 100%);
+}
+.onboardLive {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(6px);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: #fff;
+}
+.onboardLiveDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #34c759;
+  box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.25);
+}
+.onboardMain {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.onboardAvatarLg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #0071e3, #0058a3);
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.08);
+}
+.onboardSelf {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 74px;
+  height: 54px;
+  border-radius: 11px;
+  background: linear-gradient(160deg, #34c759, #1e9e44);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.3);
+}
+.onboardAvatarSm {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+.onboardInfo {
+  position: absolute;
+  left: 14px;
+  bottom: 64px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 13px;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+}
+.onboardInfoIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(0, 113, 227, 0.12);
+  color: var(--blue);
+  flex-shrink: 0;
+}
+.onboardInfoTitle {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.onboardInfoMeta {
+  display: block;
+  font-size: 11px;
+  color: var(--text-light);
+}
+.onboardBar {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  z-index: 3;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(8px);
+}
+.onboardCtrl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+.onboardCtrlActive {
+  background: var(--blue);
+}
+
+/* numbered step timeline */
+.stepsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px 32px;
+}
+.stepItem {
+  position: relative;
+  text-align: left;
+  transition: transform 0.25s;
+}
+.stepItem:hover {
+  transform: translateY(-4px);
+}
+.stepNum {
+  display: block;
+  width: fit-content;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  background: linear-gradient(120deg, #0071e3, #34c759);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 12px;
+}
+.stepTitle {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+.stepBody {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  letter-spacing: -0.005em;
+  margin: 0;
+}
+
+@media (max-width: 860px) {
+  .stepsGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 28px 24px;
+  }
+}
+@media (max-width: 520px) {
+  .stepsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 760px) {
+  .hero {
+    padding: 112px 20px 40px;
+  }
+  /* Keep section vertical rhythm consistent on mobile */
+  .toolsSection,
+  .stepsSection {
+    padding: 64px 18px;
+  }
+  .stmtSection {
+    padding: 64px 18px;
+  }
+  /* Mobile reflows the hero stage into a vertical stack: enlarged skyline,
+     then the two stat cards, then (via the sibling trust block) the
+     developer logos. The cards no longer float over the skyline. */
+  .heroStage {
+    height: auto;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  /* Decorative orbit arcs are tied to the desktop fixed-height stage; hide
+     them here so the vertical stack stays clean. */
+  .orbits {
+    display: none;
+  }
+  /* Enlarge + center-crop the skyline so it reads big (Burj dominant) like
+     the reference, instead of a thin full-width strip. Driving height makes
+     width overflow the viewport; the hero's overflow: hidden crops the sides
+     evenly around the centred image. Relative (not absolute) so it sits in
+     the flow and the cards stack beneath it. */
+  .orbSkyline {
+    position: static;
+    transform: none;
+    width: auto;
+    max-width: none;
+    /* Fill the first view: viewport height minus the ~330px header stack
+       (nav clearance + title + subtitle + CTAs), so only title + CTAs +
+       skyline show above the fold and the cards + developers sit below it.
+       Driven by height, the width overflows and is centre-cropped by the
+       hero's overflow: hidden — the skyline reads large, Burj-dominant. */
+    height: clamp(300px, calc(100svh - 330px), 560px);
+    order: 1;
+  }
+  /* Show the stat cards as full-width blocks stacked under the skyline. */
+  .fcardA,
+  .fcardC {
+    display: flex;
+    position: static;
+    inset: auto;
+    width: 100%;
+    max-width: 360px;
+    margin: 12px 0 0;
+    rotate: 0deg;
+    animation: none;
+  }
+  .fcardC { order: 2; }
+  .fcardA { order: 3; }
+}
+
+@media (max-width: 420px) {
+  .fcard {
+    padding: 9px 11px;
+  }
+  .fcardValue {
+    font-size: 13px;
+  }
+}
+
+/* ===================================================================
+   BUYER COMPARISON + SCENARIO CARDS
+   Dedicated, animated redesign (isolated from the shared Persona*
+   styles so the legacy pages stay untouched).
+   =================================================================== */
+
+.cmpSection {
+  padding: 100px 22px;
+  background: var(--bg);
+}
+.cmpSectionAlt {
+  background:
+    radial-gradient(70% 60% at 50% 0%, rgba(0, 113, 227, 0.05), transparent 70%),
+    var(--bg-alt);
+}
+.cmpInner {
+  max-width: 1060px;
+  margin: 0 auto;
+}
+.cmpHead {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 52px;
+}
+.cmpEyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 14px;
+}
+.cmpHeading {
+  font-size: clamp(30px, 4.2vw, 48px);
+  line-height: 1.07;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin: 0;
+}
+.cmpSub {
+  margin: 18px auto 0;
+  max-width: 560px;
+  font-size: clamp(15px, 1.9vw, 18px);
+  line-height: 1.55;
+  color: var(--text-muted);
+  letter-spacing: -0.01em;
+}
+
+/* ---- comparison grid (bad vs good) ---- */
+.cmpGrid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+  gap: 18px;
+}
+
+.cmpVs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  animation: vsPulse 3.2s ease-in-out infinite;
+}
+@keyframes vsPulse {
+  0%, 100% { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); }
+  50% { box-shadow: 0 6px 26px rgba(0, 113, 227, 0.22); }
+}
+
+/* ---- card base ---- */
+.card {
+  position: relative;
+  border-radius: 24px;
+  padding: 26px 26px 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  will-change: transform;
+}
+.cardBad {
+  background: var(--bg-alt);
+  border: 1px solid var(--border-soft);
+}
+.cardGood {
+  background: linear-gradient(165deg, #232327 0%, #1a1a1d 55%, #141417 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.12),
+    0 30px 70px rgba(0, 88, 163, 0.18);
+}
+/* Animated sheen sweeping across the highlight card */
+.cardGood::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.07),
+    transparent
+  );
+  transform: skewX(-18deg);
+  animation: sheen 6.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes sheen {
+  0% { left: -60%; }
+  35%, 100% { left: 130%; }
+}
+
+/* ---- card header ---- */
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.cardIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  flex-shrink: 0;
+}
+.cardIconBad {
+  background: rgba(209, 69, 59, 0.1);
+  color: #c8392f;
+}
+.cardIconGood {
+  background: rgba(41, 151, 255, 0.16);
+  color: #5cb0ff;
+}
+.cardName {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.cardBad .cardName {
+  color: var(--text-muted);
+}
+.cardGood .cardName {
+  color: #9fd0ff;
+}
+
+/* ---- rows ---- */
+.rows {
+  display: flex;
+  flex-direction: column;
+}
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 0;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid transparent;
+}
+.cardBad .row {
+  border-color: rgba(0, 0, 0, 0.05);
+}
+.cardGood .row {
+  border-color: rgba(255, 255, 255, 0.07);
+}
+.row:last-child {
+  border-bottom: none;
+}
+.rowLabel {
+  color: var(--text-muted);
+}
+.cardGood .rowLabel {
+  color: #a1a1a6;
+}
+.rowLabelBlue {
+  color: #0071e3 !important;
+  animation: highlightPulse 2s ease-in-out infinite;
+}
+.cardBad .rowLabelBlue {
+  color: #5fa3ff !important;
+  animation: highlightPulse 2s ease-in-out infinite;
+}
+.rowLabelRed {
+  color: #ff5757 !important;
+  animation: highlightPulse 2s ease-in-out infinite;
+}
+.rowValue {
+  font-weight: 600;
+  text-align: right;
+  color: var(--ink);
+}
+.cardGood .rowValue {
+  color: #f5f5f7;
+}
+.rowValueRed {
+  color: #ff5757 !important;
+  animation: highlightPulse 2s ease-in-out infinite;
+}
+.rowValueBlue {
+  color: #0071e3 !important;
+  animation: highlightPulse 2s ease-in-out infinite;
+}
+
+@keyframes highlightPulse {
+  0%, 100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.85;
+    filter: brightness(1.15);
+  }
+}
+
+/* ---- result block ---- */
+.result {
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px dashed transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cardBad .result {
+  border-color: var(--border);
+}
+.cardGood .result {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.resultLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-light);
+}
+.resultRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.resultValue {
+  font-size: clamp(30px, 4.4vw, 44px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.cardBad .resultValue {
+  color: #34c759;
+}
+.cardGood .resultValue {
+  color: #34c759;
+}
+.resultValueGreen {
+  color: #34c759 !important;
+}
+
+/* green "you save" pill on the good card */
+.savePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  background: rgba(52, 199, 89, 0.16);
+  color: #51d06a;
+  border: 1px solid rgba(52, 199, 89, 0.28);
+}
+
+/* ---- scenarios grid (two positive cards) ---- */
+.scnGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.scnBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(41, 151, 255, 0.14);
+  color: #7cc0ff;
+  border: 1px solid rgba(41, 151, 255, 0.22);
+}
+.scnBadgeGreen {
+  background: rgba(52, 199, 89, 0.14);
+  color: #5fd877;
+  border-color: rgba(52, 199, 89, 0.24);
+}
+.scnTitle {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #f5f5f7;
+  margin: 0;
+}
+
+.cmpFoot {
+  margin-top: 26px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-light);
+  letter-spacing: -0.005em;
+}
+
+/* ---- responsive ---- */
+@media (max-width: 760px) {
+  .cmpSection {
+    padding: 64px 18px;
+  }
+  .cmpGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .cmpVs {
+    justify-self: center;
+    width: 44px;
+    height: 44px;
+  }
+  .scnGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cmpVs,
+  .cardGood::after {
+    animation: none;
+  }
+}
+
+/* ---- Fast track CTA section ---- */
+.fasttrackSection {
+  padding: 60px 22px;
+  background: linear-gradient(135deg, #f9f9fb 0%, #ffffff 100%);
+}
+
+.fasttrackInner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.fasttrackContent {
+  text-align: center;
+  padding: 48px 36px;
+  border-radius: 20px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+}
+
+.fasttrackHeading {
+  font-size: clamp(24px, 3.2vw, 36px);
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0 0 14px;
+}
+
+.fasttrackSub {
+  margin: 0 auto 28px;
+  max-width: 480px;
+  font-size: clamp(14px, 1.6vw, 16px);
+  line-height: 1.5;
+  color: var(--text-muted);
+  letter-spacing: -0.01em;
+}
+
+.fasttrackBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 28px;
+  border-radius: 980px;
+  background: var(--blue);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+}
+
+.fasttrackBtn:hover {
+  background: var(--blue-hover);
+  box-shadow: 0 6px 16px rgba(0, 113, 227, 0.4);
+}
+
+@media (max-width: 640px) {
+  .fasttrackSection {
+    padding: 48px 18px;
+  }
+
+  .fasttrackContent {
+    padding: 36px 24px;
+  }
+
+  .fasttrackBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ---- Testimonials carousel ---- */
+.testimonialsSection {
+  padding: 100px 22px 80px;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%);
+}
+
+.testimonialsInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 60px;
+}
+
+/* Header */
+.testimonialsHeader {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.testimonialsHeading {
+  font-size: clamp(32px, 5vw, 48px);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0 0 12px;
+}
+
+.testimonialsSubheading {
+  font-size: 16px;
+  color: var(--text-muted);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.subheadingAccent {
+  color: var(--blue);
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* Marquee container - constrained to section */
+.testimonialsMarquee {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  margin: 0 auto 60px;
+  padding: 20px 22px;
+  background: linear-gradient(
+    90deg,
+    var(--bg) 0%,
+    var(--bg) 4%,
+    transparent 8%,
+    transparent 92%,
+    var(--bg) 96%,
+    var(--bg) 100%
+  );
+  border-radius: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.testimonialsInner .testimonialsMarquee {
+  max-width: calc(100% - 44px);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Marquee rows */
+.marqueeRow {
+  width: 100%;
+  overflow: hidden;
+}
+
+.marqueeTrack {
+  display: flex;
+  gap: 24px;
+  animation: marquee 60s linear infinite;
+  width: fit-content;
+  will-change: transform;
+}
+
+.marqueeTrackReverse {
+  animation: marqueeReverse 60s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-50% - 12px));
+  }
+}
+
+@keyframes marqueeReverse {
+  0% {
+    transform: translateX(calc(-50% - 12px));
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.testimonialsMarquee:hover .marqueeTrack {
+  animation-play-state: paused;
+}
+
+/* Card sizes for marquee */
+.testimonialCard {
+  flex: 0 0 auto;
+  width: 320px;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.3s ease-out;
+}
+
+.testimonialCard:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.testimonialsMarquee:hover .marqueeTrack {
+  animation-play-state: paused;
+}
+
+/* Card info */
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cardName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.cardHandle {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: -0.005em;
+}
+
+/* Quote text */
+.cardQuote {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink);
+  margin: 0;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Card footer */
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.cardDate {
+  font-size: 11px;
+  color: var(--text-light);
+  letter-spacing: -0.005em;
+}
+
+/* CTA section */
+.testimonialsCTA {
+  text-align: center;
+}
+
+.testimonialsCtaBtn {
+  padding: 14px 32px;
+  border: none;
+  border-radius: 8px;
+  background: var(--blue);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+}
+
+.testimonialsCtaBtn:hover {
+  background: var(--blue-hover);
+  box-shadow: 0 6px 16px rgba(0, 113, 227, 0.4);
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.cardQuote {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.cardMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+}
+
+.cardName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.cardRole {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: -0.005em;
+}
+
+.cardBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  background: var(--green);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Content section below carousel */
+.testimonialsContent {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+.testimonialsHeading {
+  font-size: clamp(32px, 5vw, 56px);
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0;
+  max-width: 600px;
+}
+
+.testimonialsHeadingAccent {
+  color: var(--blue);
+}
+
+.testimonialsCta {
+  padding: 14px 32px;
+  border: none;
+  border-radius: 8px;
+  background: var(--blue);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+}
+
+.testimonialsCta:hover {
+  background: var(--blue-hover);
+  box-shadow: 0 6px 16px rgba(0, 113, 227, 0.4);
+}
+
+/* Navigation dots */
+.testimonialsNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.testimonialDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.testimonialDot:hover {
+  background: var(--border-soft);
+  transform: scale(1.2);
+}
+
+.testimonialDotActive {
+  background: var(--ink);
+  width: 24px;
+  border-radius: 4px;
+}
+
+@media (max-width: 1200px) {
+  .testimonialCard {
+    width: 300px;
+  }
+
+  .marqueeTrack {
+    gap: 20px;
+    animation: marquee 55s linear infinite;
+  }
+
+  .testimonialsMarquee {
+    padding: 20px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .testimonialsSection {
+    padding: 80px 18px 60px;
+  }
+
+  .testimonialsHeader {
+    margin-bottom: 48px;
+  }
+
+  .testimonialsMarquee {
+    margin-bottom: 48px;
+    padding: 16px 16px;
+    border-radius: 16px;
+    background: linear-gradient(
+      90deg,
+      var(--bg) 0%,
+      var(--bg) 5%,
+      transparent 10%,
+      transparent 90%,
+      var(--bg) 95%,
+      var(--bg) 100%
+    );
+  }
+
+  .testimonialsInner .testimonialsMarquee {
+    max-width: calc(100% - 32px);
+  }
+
+  .testimonialCard {
+    width: 280px;
+    padding: 16px;
+  }
+
+  .marqueeTrack {
+    gap: 16px;
+    animation: marquee 50s linear infinite;
+  }
+
+  .cardQuote {
+    font-size: 13px;
+  }
+
+  .testimonialsHeading {
+    font-size: clamp(24px, 3.5vw, 36px);
+  }
+}
+
+@media (max-width: 480px) {
+  .testimonialsSection {
+    padding: 60px 16px 50px;
+  }
+
+  .testimonialsHeader {
+    margin-bottom: 40px;
+  }
+
+  .testimonialsMarquee {
+    margin-bottom: 40px;
+    padding: 14px 14px;
+    border-radius: 12px;
+    background: linear-gradient(
+      90deg,
+      var(--bg) 0%,
+      var(--bg) 3%,
+      transparent 8%,
+      transparent 92%,
+      var(--bg) 97%,
+      var(--bg) 100%
+    );
+  }
+
+  .testimonialsInner .testimonialsMarquee {
+    max-width: calc(100% - 28px);
+  }
+
+  .testimonialCard {
+    width: 260px;
+    padding: 16px;
+  }
+
+  .marqueeTrack {
+    gap: 12px;
+    animation: marquee 45s linear infinite;
+  }
+
+  .cardQuote {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .cardName {
+    font-size: 12px;
+  }
+
+  .cardHandle {
+    font-size: 10px;
+  }
+
+  .cardDate {
+    font-size: 10px;
+  }
+
+  .reaction {
+    font-size: 11px;
+  }
+
+  .likeCount {
+    font-size: 10px;
+  }
+
+  .testimonialsHeading {
+    font-size: 24px;
+  }
+}
