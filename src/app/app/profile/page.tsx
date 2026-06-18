@@ -18,6 +18,12 @@ export default async function ProfileScreen() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  let balance: number | null = null;
+  if (user) {
+    const { data } = await supabase.rpc("my_wallet_balance");
+    balance = typeof data === "number" ? data : 0;
+  }
+
   return (
     <div>
       <ScreenHeader title="Profile" />
@@ -35,6 +41,20 @@ export default async function ProfileScreen() {
                     Signed in
                   </Pill>
                 </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="flex items-center justify-between p-5">
+                <div>
+                  <p className="text-sm text-muted-foreground">Wallet</p>
+                  <p className="text-2xl font-bold tracking-tight">
+                    {balance ?? 0}{" "}
+                    <span className="text-base font-medium text-muted-foreground">
+                      credits
+                    </span>
+                  </p>
+                </div>
+                <Pill variant="outline">1 credit = 1 unlock</Pill>
               </CardContent>
             </Card>
             <form action="/auth/signout" method="post">

@@ -5,10 +5,9 @@ const nextConfig: NextConfig = {
   // project URL is known. Tighten the hostname when env is wired.
   images: {
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "*.supabase.co",
-      },
+      { protocol: "https", hostname: "*.supabase.co" },
+      // Demo feed imagery (seed data). Real posts use Supabase Storage.
+      { protocol: "https", hostname: "images.unsplash.com" },
     ],
   },
 };
