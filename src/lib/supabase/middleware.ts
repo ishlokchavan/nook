@@ -16,6 +16,16 @@ type CookieToSet = { name: string; value: string; options: CookieOptions };
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
+  // Defence: middleware runs on every route. If Supabase env isn't configured
+  // (e.g. a preview deploy before env vars are set), skip session handling
+  // rather than throwing — a missing key must never take the whole site down.
+  if (
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
+    return supabaseResponse;
+  }
+
   const supabase = createServerClient(env.supabaseUrl, env.supabaseAnonKey, {
     cookies: {
       getAll() {
