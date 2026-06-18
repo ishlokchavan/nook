@@ -47,5 +47,86 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    letter-spacing: -0.011em;
+  }
+  ::selection {
+    background-color: hsl(var(--foreground));
+    color: hsl(var(--background));
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+ * App-shell "liquid glass" — frosted translucency for the installable /app
+ * experience. Adapted from closehq's lg-* system, tuned for Nook's warm
+ * light palette (honey accent over #FAFAF8). Scoped lg-* names.
+ * ------------------------------------------------------------------------- */
+@layer components {
+  /* Light frosted-white chrome — the floating tab bar / pills sit on this. */
+  .lg-glass-light {
+    background: rgba(255, 255, 255, 0.62);
+    backdrop-filter: blur(30px) saturate(190%);
+    -webkit-backdrop-filter: blur(30px) saturate(190%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow:
+      0 10px 34px rgba(28, 27, 25, 0.12),
+      0 2px 8px rgba(28, 27, 25, 0.05),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.85),
+      inset 0 -1px 1px 0 rgba(28, 27, 25, 0.03);
+  }
+  /* Dark-tinted glass for chips laid over bright imagery. */
+  .lg-glass-dark {
+    background: rgba(28, 27, 25, 0.42);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  /* Solid sheet that rises over content (info panel / bottom sheets). */
+  .lg-sheet {
+    background: hsl(var(--card));
+    box-shadow: 0 -10px 40px rgba(28, 27, 25, 0.14);
+  }
+}
+
+@layer utilities {
+  /* Readability scrims over full-bleed project photography. */
+  .lg-scrim-b {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.78) 0%,
+      rgba(0, 0, 0, 0.45) 26%,
+      rgba(0, 0, 0, 0) 60%
+    );
+  }
+  .lg-snap-y {
+    scroll-snap-type: y mandatory;
+  }
+  .lg-snap-start {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+  @keyframes lg-pop {
+    0% { transform: scale(0.6); opacity: 0; }
+    55% { transform: scale(1.08); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .lg-animate-pop {
+    animation: lg-pop 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-up {
+    animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 }

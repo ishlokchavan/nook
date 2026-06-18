@@ -37,8 +37,14 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Gate the authenticated area. Unauthenticated users are redirected to login.
-  const isProtected = request.nextUrl.pathname.startsWith("/app");
+  // The whole /app shell is PUBLIC (clients browse free). Tabs that need an
+  // account show an inline sign-in prompt rather than bouncing the user out of
+  // the app, so middleware only hard-redirects genuinely sensitive areas (e.g.
+  // the future admin console). Everything else just gets its cookie refreshed.
+  const PROTECTED_PREFIXES = ["/admin"];
+  const isProtected = PROTECTED_PREFIXES.some((p) =>
+    request.nextUrl.pathname.startsWith(p),
+  );
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
