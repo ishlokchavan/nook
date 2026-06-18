@@ -14,16 +14,26 @@ function required(name: string, value: string | undefined): string {
   return value;
 }
 
+/**
+ * Public env, exposed via getters so validation runs only when a value is
+ * actually read (at request/interaction time) — never at module import. This
+ * keeps `next build` from crashing when env isn't present in the build
+ * environment (e.g. a preview deploy before env vars are configured); static
+ * pages that don't touch Supabase still render.
+ */
 export const env = {
-  // Public — available in browser and server bundles.
-  supabaseUrl: required(
-    "NEXT_PUBLIC_SUPABASE_URL",
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-  ),
-  supabaseAnonKey: required(
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  ),
+  get supabaseUrl(): string {
+    return required(
+      "NEXT_PUBLIC_SUPABASE_URL",
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+    );
+  },
+  get supabaseAnonKey(): string {
+    return required(
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    );
+  },
 };
 
 /**
