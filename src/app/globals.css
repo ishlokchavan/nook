@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Nook design tokens.
+ *   bg     #FAFAF8  -> --background
+ *   ink    #1C1B19  -> --foreground
+ *   honey  #BE7F33  -> --primary
+ * Values are HSL (no hsl() wrapper) so Tailwind can compose opacity.
+ */
+@layer base {
+  :root {
+    --background: 60 17% 98%;
+    --foreground: 40 6% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 40 6% 10%;
+
+    --primary: 33 58% 47%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 40 12% 94%;
+    --secondary-foreground: 40 6% 10%;
+
+    --muted: 40 12% 94%;
+    --muted-foreground: 40 4% 42%;
+
+    --accent: 33 58% 47%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 40 10% 88%;
+    --input: 40 10% 88%;
+    --ring: 33 58% 47%;
+
+    --radius: 1rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
